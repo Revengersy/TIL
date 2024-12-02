@@ -5,6 +5,7 @@
 - [2. 유지보수 용이성](#2-유지보수-용이성)
 - [3. 기본값 제공](#3-기본값-제공)
 - [4. 의존성 주입과 DI 프레임워크의 통합](#4-의존성-주입과-di-프레임워크의-통합)
+- [5.코드 예시](#5-코드-예시)
 
 ### 1. 간결함과 명확성
 
@@ -91,3 +92,61 @@ public class MyBean {
     // 코드 내에서 자동으로 주입됨
 }
 ```
+
+### 5. 코드 예시
+
+[코드 예시](./src/xml)는 로컬 수준에서 간단하게 돌아가도록 작성된 예시이다. 이는 어노테이션이 아닌 xml.web 사용을 모사했다.
+어노테이션을 사용한다면 필요 없어 지는 XML 파싱 관련 코드이다.
+
+```java
+// XML 파일 읽기
+File xmlFile = new File("src/com/example/web.xml");
+DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+DocumentBuilder builder = factory.newDocumentBuilder();
+Document doc = builder.parse(xmlFile);
+doc.getDocumentElement().normalize();
+
+// 서블릿 클래스 찾기
+NodeList servletNodes = doc.getElementsByTagName("servlet");
+Node servletNode = servletNodes.item(0); // 첫 번째 서블릿 사용
+String servletClass = null;
+
+if (servletNode.getNodeType() == Node.ELEMENT_NODE) {
+    Element element = (Element) servletNode;
+    servletClass = element.getElementsByTagName("servlet-class").item(0).getTextContent();
+}
+
+// URL 매핑 찾기
+NodeList mappingNodes = doc.getElementsByTagName("servlet-mapping");
+Node mappingNode = mappingNodes.item(0);
+String urlPattern = null;
+
+if (mappingNode.getNodeType() == Node.ELEMENT_NODE) {
+    Element element = (Element) mappingNode;
+    urlPattern = element.getElementsByTagName("url-pattern").item(0).getTextContent();
+}
+```
+
+해당 코드는 아래와 같이 대체된다.
+```java
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@WebServlet("/example")
+public class MockServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        resp.getWriter().println("<h1>Hello, this is an annotated servlet response!</h1>");
+    }
+}
+```
+
+### 6.그러면 annotation과 Java Reflect의 무엇이 이걸 가능하게 하는데?
+
+[코드 예시](./src/annotation)는 Reflect를 통해 Annotation을 활용하는 예제이다.
+
+

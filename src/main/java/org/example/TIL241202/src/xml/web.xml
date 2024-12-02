@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+    <servlet>
+        <servlet-name>exampleServlet</servlet-name>
+        <servlet-class>org.example.TIL241202.src.xml.MockServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>exampleServlet</servlet-name>
+        <url-pattern>/example</url-pattern>
+    </servlet-mapping>
+</web-app>
